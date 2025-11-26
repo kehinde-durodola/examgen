@@ -1,0 +1,45 @@
+{
+  "name": "examgen",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AI-powered exam question generator with React frontend and Express backend",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "npm run build:server && npm run build:client",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build",
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "prisma:generate": "cd server && npx prisma generate",
+    "prisma:migrate": "cd server && npx prisma migrate dev",
+    "prisma:studio": "cd server && npx prisma studio"
+  },
+  "keywords": [
+    "examgen",
+    "ai",
+    "exam-generator",
+    "question-generator",
+    "education",
+    "openai",
+    "react",
+    "express",
+    "typescript",
+    "prisma",
+    "postgresql",
+    "monorepo"
+  ],
+  "author": {
+    "name": "Kehinde Durodola",
+    "url": "https://github.com/kehinde-durodola"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kehinde-durodola/examgen"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
