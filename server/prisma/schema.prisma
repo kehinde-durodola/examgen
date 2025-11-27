@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  
+  tokensRemaining     Int      @default(3)
+  tokensLastRefreshed DateTime @default(now())
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  generations Generation[]
+  
+  @@index([email])
+}
+
+model Generation {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  sourceType String
+  sourceName String
+  
+  questionCount Int
+  difficulty    String
+  
+  status String @default("processing")
+  score  Float?
+  
+  createdAt DateTime @default(now())
+  
+  questions Question[]
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@index([status])
+}
+
+model Question {
+  id           String     @id @default(uuid())
+  generationId String
+  generation   Generation @relation(fields: [generationId], references: [id], onDelete: Cascade)
+  
+  questionText  String
+  options       Json
+  correctAnswer String
+  explanation   String
+  
+  createdAt DateTime @default(now())
+  
+  @@index([generationId])
+}
