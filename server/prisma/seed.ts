@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../src/config/database.js";
 import bcrypt from "bcrypt";
-
-const prisma = new PrismaClient();
 
 async function main() {
   console.log("Starting database seed...");
@@ -19,7 +17,7 @@ async function main() {
 
   const user = await prisma.user.create({
     data: {
-      email: "test@examgen.com",
+      email: "test@example.com",
       password: hashedPassword,
       name: "Test User",
       tokensRemaining: 3,
