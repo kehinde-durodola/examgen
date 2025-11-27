@@ -1,38 +1,40 @@
 import { prisma } from "../src/config/database.js";
-import bcrypt from "bcrypt";
+import { hashPassword } from "../src/utils/password.util.js";
+import { logger } from "../src/utils/logger.util.js";
 
 async function main() {
-  console.log("Starting database seed...");
+  logger.info("Starting database seed...");
 
   const existingUser = await prisma.user.findUnique({
-    where: { email: "test@example.com" },
+    where: { email: "test@examgen.com" },
   });
 
   if (existingUser) {
-    console.log("Test user already exists");
+    logger.info("Test user already exists");
     return;
   }
 
-  const hashedPassword = await bcrypt.hash("test123", 10);
+  const hashedPassword = await hashPassword("test123");
 
   const user = await prisma.user.create({
     data: {
-      email: "test@example.com",
+      email: "test@examgen.com",
       password: hashedPassword,
       name: "Test User",
       tokensRemaining: 3,
     },
   });
 
-  console.log("Test user created:");
-  console.log("Email: test@example.com");
-  console.log("Password: test123");
-  console.log("Seed complete");
+  logger.info("Test user created:", {
+    email: user.email,
+    password: "test123",
+  });
+  logger.info("Seed complete");
 }
 
 main()
   .catch((e) => {
-    console.error("Seed failed:", e);
+    logger.error("Seed failed:", e);
     process.exit(1);
   })
   .finally(async () => {
