@@ -1,0 +1,16 @@
+import { Router } from "express";
+import authRoutes from "./auth.routes.js";
+import userRoutes from "./user.routes.js";
+import tokenRoutes from "./token.routes.js";
+import generationRoutes from "./generation.routes.js";
+import questionRoutes from "./question.routes.js";
+
+const router = Router();
+
+router.use("/auth", authRoutes);
+router.use("/users", userRoutes);
+router.use("/tokens", tokenRoutes);
+router.use("/generations", generationRoutes);
+router.use("/generations", questionRoutes);
+
+export default router;
