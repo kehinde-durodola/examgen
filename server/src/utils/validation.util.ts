@@ -1,4 +1,4 @@
-import { MIN_CHARS_PER_QUESTION } from "../../../shared/index.js";
+import { MIN_CHARS_PER_QUESTION } from "../constants/index.js";
 
 export const validateTextLength = (
   text: string,

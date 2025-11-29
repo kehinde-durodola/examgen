@@ -9,7 +9,7 @@ import { extractTextFromPDF } from "../utils/pdf.util.js";
 import { validateTextLength } from "../utils/validation.util.js";
 import { consumeToken } from "./token.service.js";
 import { openai } from "../config/openai.js";
-import { IPDFFile } from "../../../shared/index.js";
+import { IPDFFile } from "../types/generation.types.js";
 
 const buildPrompt = (
   content: string,

@@ -1,6 +1,0 @@
-{
-  "name": "@examgen/shared",
-  "dependencies": {
-    "zod": "^3.22.4"
-  }
-}

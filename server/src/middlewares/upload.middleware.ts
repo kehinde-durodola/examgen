@@ -1,5 +1,5 @@
 import multer from "multer";
-import { MAX_PDF_SIZE } from "../../../shared/index.js";
+import { MAX_PDF_SIZE } from "../constants/index.js";
 
 const storage = multer.memoryStorage();
 

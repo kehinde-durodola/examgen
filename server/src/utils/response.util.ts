@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { ApiResponse, ApiError } from "../../../shared/index.js";
+import { ApiResponse, ApiError } from "../types/api.types.js";
 
 export const successResponse = <T>(
   res: Response,

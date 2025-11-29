@@ -4,39 +4,68 @@ An open-source web application that transforms study materials into practice exa
 
 ## Features
 
-- AI Question Generation - Upload PDFs and generate practice questions using OpenAI
+- AI Question Generation - Upload PDFs or paste text to generate practice questions using OpenAI
 - Token-Based Usage - 3 free generations per day, resets at midnight UTC
-- Interactive Practice Tests - Take timed tests with instant grading
-- Smart PDF Processing - Client-side text extraction from study materials
+- Client-Side Grading - Instant test results with explanations
 - Secure Authentication - JWT-based user authentication
 - Auto-Cleanup - Questions automatically expire after 24 hours
-- Download Options - Export questions and answers as separate PDFs
 
-## Architecture
+## Tech Stack
 
-**Monorepo Structure**
+**Backend:**
+
+- Node.js + Express + TypeScript
+- Prisma ORM + PostgreSQL
+- OpenAI GPT-4o-mini
+- JWT Authentication
+- Multer (file uploads)
+- pdf-parse (PDF text extraction)
+
+**Frontend:** (Coming soon)
+
+- React 18 + TypeScript + Vite
+- TailwindCSS + Shadcn/ui
+
+**Deployment:**
+
+- Backend: Railway
+- Frontend: Vercel
+- Database: Railway PostgreSQL
+
+## Project Structure
 
 ```
 examgen/
-├── client/          # React + Vite + TypeScript
-├── server/          # Express + Prisma + PostgreSQL
-├── shared/          # Shared TypeScript types
-└── package.json     # Root scripts with concurrently
+├── server/                  # Express backend
+│   ├── src/
+│   │   ├── config/         # Database, env, OpenAI clients
+│   │   ├── constants/      # Application constants
+│   │   ├── types/          # TypeScript type definitions
+│   │   ├── validation/     # Zod validation schemas
+│   │   ├── utils/          # Helper functions
+│   │   ├── middlewares/    # Express middlewares
+│   │   ├── repositories/   # Database access layer
+│   │   ├── services/       # Business logic
+│   │   ├── controllers/    # Request handlers
+│   │   ├── routes/         # API routes
+│   │   ├── app.ts          # Express app config
+│   │   └── server.ts       # Server entry point
+│   ├── prisma/
+│   │   ├── schema.prisma   # Database schema
+│   │   └── seed.ts         # Seed script
+│   └── package.json
+│
+├── client/                  # React frontend (Coming soon)
+│
+├── package.json            # Root scripts
+└── README.md
 ```
-
-**Tech Stack**
-
-- Frontend: React 18, TypeScript, Vite, TailwindCSS, Shadcn/ui
-- Backend: Node.js, Express, TypeScript, Prisma ORM
-- Database: PostgreSQL
-- AI: OpenAI GPT-4o-mini
-- Deployment: Railway (backend), Vercel (frontend)
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 20+ LTS
+- Node.js 24+ LTS
 - PostgreSQL 15+
 - OpenAI API key
 
@@ -47,48 +76,156 @@ examgen/
 git clone https://github.com/kehinde-durodola/examgen.git
 cd examgen
 
-# Install all dependencies
-npm run install:all
+# Install server dependencies
+cd server
+npm install
 
 # Setup environment variables
-cp server/.env.example server/.env
-# Add your DATABASE_URL and OPENAI_API_KEY
+cp .env.example .env
+# Edit .env and add your DATABASE_URL and OPENAI_API_KEY
 
 # Run database migrations
 npm run prisma:migrate
 
-# Start development servers
+# Seed test user (optional)
+npm run prisma:seed
+
+# Start development server
 npm run dev
 ```
 
-The application will be available at:
+The backend will be available at: http://localhost:3000
 
-- Frontend: http://localhost:5173
-- Backend: http://localhost:3000
+## API Endpoints
 
-## Development
+### Authentication
 
-### Available Scripts
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
+- `GET /api/auth/me` - Get current user (protected)
+
+### Generations
+
+- `POST /api/generations` - Create new generation (protected, requires tokens)
+- `GET /api/generations/:id` - Get specific generation (protected)
+- `GET /api/generations` - Get user's generation history (protected)
+
+### Questions
+
+- `GET /api/generations/:id/questions` - Get questions for test (protected)
+- `POST /api/generations/:id/score` - Submit test score (protected)
+
+### Tokens
+
+- `GET /api/tokens` - Get token information (protected)
+
+### Health
+
+- `GET /health` - Health check
+
+## Environment Variables
+
+Create `server/.env` file:
+
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/examgen_db?schema=public"
+
+# JWT
+JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
+JWT_EXPIRES_IN="7d"
+
+# OpenAI
+OPENAI_API_KEY="sk-your-openai-api-key-here"
+
+# Server
+PORT=3000
+NODE_ENV="development"
+
+# CORS
+ALLOWED_ORIGINS="http://localhost:5173"
+
+# Token System
+DAILY_TOKEN_LIMIT=3
+TOKEN_REFRESH_CRON="0 0 * * *"
+```
+
+## Development Scripts
 
 ```bash
-# Run both client and server concurrently
-npm run dev
+# Development
+npm run dev              # Start dev server with hot reload
+npm run type-check       # Run TypeScript type checking
 
-# Run server only
-npm run dev:server
+# Database
+npm run prisma:generate  # Generate Prisma client
+npm run prisma:migrate   # Run database migrations
+npm run prisma:studio    # Open Prisma Studio GUI
+npm run prisma:seed      # Seed test user
 
-# Run client only
-npm run dev:client
-
-# Build for production
-npm run build
-
-# Run Prisma Studio (database GUI)
-npm run prisma:studio
-
-# Run database migrations
-npm run prisma:migrate
+# Production
+npm run build            # Compile TypeScript
+npm start                # Start production server
 ```
+
+## Test User (Development)
+
+After running `npm run prisma:seed`:
+
+- Email: `test@example.com`
+- Password: `test123`
+- Tokens: 3
+
+## Database Schema
+
+**User**
+
+- JWT authentication
+- Token tracking (3 per day)
+- Automatic token refresh at midnight UTC
+
+**Generation**
+
+- Links to User
+- Supports PDF upload or text paste
+- Tracks status (processing/completed/failed)
+- Stores latest test score
+- Auto-deletes after 24 hours
+
+**Question**
+
+- Links to Generation
+- Multiple choice (A, B, C, D)
+- Includes explanation
+- Generated by OpenAI GPT-4o-mini
+
+## Deployment
+
+### Backend (Railway)
+
+1. Create new project on Railway
+2. Add PostgreSQL database
+3. Connect GitHub repository
+4. Set root directory to `/server`
+5. Add environment variables
+6. Deploy
+
+### Frontend (Vercel) - Coming Soon
+
+1. Import project from GitHub
+2. Set framework preset to Vite
+3. Set root directory to `/client`
+4. Add environment variable: `VITE_API_URL`
+5. Deploy
+
+## Roadmap
+
+- [x] Backend API (Express + Prisma + PostgreSQL)
+- [x] AI Question Generation (OpenAI)
+- [x] Authentication & Authorization (JWT)
+- [x] Token System (Daily limits)
+- [ ] Frontend UI (React + Vite)
+- [ ] Deployment (Railway + Vercel)
 
 ## Author
 
@@ -97,3 +234,7 @@ npm run prisma:migrate
 - Portfolio: [devkehinde.com](https://devkehinde.com)
 - GitHub: [@kehinde-durodola](https://github.com/kehinde-durodola)
 - LinkedIn: [Kehinde Durodola](https://linkedin.com/in/kehinde-durodola)
+
+## License
+
+MIT

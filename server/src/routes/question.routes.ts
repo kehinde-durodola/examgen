@@ -5,7 +5,7 @@ import {
 } from "../controllers/question.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import { updateScoreSchema } from "../../../shared/index.js";
+import { updateScoreSchema } from "../validation/schemas.js";
 
 const router = Router();
 
