@@ -1,6 +1,6 @@
 # ExamGen - AI-Powered Exam Question Generator
 
-An open-source web application that transforms study materials into practice exam questions using AI. Students upload PDFs and receive intelligent multiple-choice questions for self-assessment.
+An open-source web application that transforms study materials into practice exam questions using AI. Students upload PDFs or paste text to receive intelligent multiple-choice questions for self-assessment.
 
 ## Features
 
@@ -104,20 +104,19 @@ The backend will be available at: http://localhost:3000
 - `POST /api/auth/login` - Login user
 - `GET /api/auth/me` - Get current user (protected)
 
+### User Management
+
+- `PATCH /api/users/me` - Update user profile (protected)
+
 ### Generations
 
 - `POST /api/generations` - Create new generation (protected, requires tokens)
-- `GET /api/generations/:id` - Get specific generation (protected)
 - `GET /api/generations` - Get user's generation history (protected)
+- `GET /api/generations/:id` - Get specific generation with questions (protected)
 
-### Questions
+### Test & Scoring
 
-- `GET /api/generations/:id/questions` - Get questions for test (protected)
 - `POST /api/generations/:id/score` - Submit test score (protected)
-
-### Tokens
-
-- `GET /api/tokens` - Get token information (protected)
 
 ### Health
 
@@ -224,6 +223,8 @@ After running `npm run prisma:seed`:
 - [x] AI Question Generation (OpenAI)
 - [x] Authentication & Authorization (JWT)
 - [x] Token System (Daily limits)
+- [x] Clean API structure (8 endpoints)
+- [ ] Token refresh cron job
 - [ ] Frontend UI (React + Vite)
 - [ ] Deployment (Railway + Vercel)
 
