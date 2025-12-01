@@ -50,7 +50,12 @@ export const getAll = async (
 ) => {
   try {
     const generations = await getUserGenerations(req.user!.id);
-    return successResponse(res, generations);
+
+    const generationsWithoutUserId = generations.map(
+      ({ userId, ...gen }) => gen
+    );
+
+    return successResponse(res, generationsWithoutUserId);
   } catch (error) {
     next(error);
   }

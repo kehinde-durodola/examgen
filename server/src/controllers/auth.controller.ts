@@ -41,7 +41,14 @@ export const getCurrentUser = async (
 ) => {
   try {
     const user = await findById(req.user!.id);
-    return successResponse(res, user);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const { password, ...userWithoutPassword } = user;
+
+    return successResponse(res, userWithoutPassword);
   } catch (error) {
     next(error);
   }

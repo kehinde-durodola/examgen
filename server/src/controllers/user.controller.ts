@@ -9,7 +9,14 @@ export const getProfile = async (
 ) => {
   try {
     const user = await findById(req.user!.id);
-    return successResponse(res, user);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const { password, ...userWithoutPassword } = user;
+
+    return successResponse(res, userWithoutPassword);
   } catch (error) {
     next(error);
   }
@@ -23,7 +30,10 @@ export const updateProfile = async (
   try {
     const { name, email } = req.body;
     const updatedUser = await update(req.user!.id, { name, email });
-    return successResponse(res, updatedUser, "Profile updated");
+
+    const { password, ...userWithoutPassword } = updatedUser;
+
+    return successResponse(res, userWithoutPassword, "Profile updated");
   } catch (error) {
     next(error);
   }
