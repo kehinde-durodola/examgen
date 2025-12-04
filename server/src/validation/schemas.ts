@@ -12,11 +12,11 @@ export const loginSchema = z.object({
 });
 
 export const createGenerationSchema = z.object({
-  questionCount: z.number().int().min(5).max(20),
+  questionCount: z.coerce.number().int().min(5).max(20),
   difficulty: z.enum(["Easy", "Medium", "Hard"]),
   textInput: z.string().min(250).optional(),
 });
 
 export const updateScoreSchema = z.object({
-  score: z.number().min(0).max(100),
+  score: z.coerce.number().min(0).max(100),
 });
