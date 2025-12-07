@@ -1,0 +1,9 @@
+export { Landing } from "./Landing";
+export { Login } from "./Login";
+export { Register } from "./Register";
+export { Dashboard } from "./Dashboard";
+export { Generate } from "./Generate";
+export { GenerationDetail } from "./GenerationDetail";
+export { Test } from "./Test";
+export { Results } from "./Results";
+export { Settings } from "./Settings";

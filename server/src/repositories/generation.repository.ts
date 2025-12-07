@@ -26,7 +26,12 @@ export const findById = async (id: string) => {
 
 export const findByUserId = async (userId: string) => {
   return await prisma.generation.findMany({
-    where: { userId },
+    where: {
+      userId,
+      status: {
+        not: "failed",
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 };
