@@ -1,4 +1,4 @@
-import { findByEmail, create } from "../repositories/user.repository.js";
+import { create, findByEmail } from "../repositories/user.repository.js";
 import { hashPassword, comparePassword } from "../utils/password.util.js";
 import { generateToken } from "../utils/jwt.util.js";
 
@@ -29,6 +29,9 @@ export const register = async (
       email: user.email,
       name: user.name,
       tokensRemaining: user.tokensRemaining,
+      tokensLastRefreshed: user.tokensLastRefreshed,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     },
     token,
   };
@@ -55,6 +58,9 @@ export const login = async (email: string, password: string) => {
       email: user.email,
       name: user.name,
       tokensRemaining: user.tokensRemaining,
+      tokensLastRefreshed: user.tokensLastRefreshed,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     },
     token,
   };

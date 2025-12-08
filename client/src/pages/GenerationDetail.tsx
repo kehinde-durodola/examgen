@@ -1,45 +1,16 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Clock,
-  BarChart2,
-  FileText,
-  PlayCircle,
-  Loader2,
-  Download,
-} from "lucide-react";
-import { Button, Card, CardContent } from "@/components/ui";
+import { Clock, BarChart2, FileText, PlayCircle, Download } from "lucide-react";
+import { Button, Card, CardContent, Spinner } from "@/components/ui";
 import { Breadcrumb, QuestionPreview } from "@/components/shared";
-import { generationService } from "@/services";
-import { formatDate } from "@/lib";
-import { generatePdf } from "@/lib/generatePdf";
-import type { GenerationWithQuestions } from "@/types";
+import { useGeneration } from "@/hooks";
+import { formatDate, generatePdf } from "@/lib";
+import { useState } from "react";
 
 export const GenerationDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [generation, setGeneration] = useState<GenerationWithQuestions | null>(
-    null
-  );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: generation, isLoading, error } = useGeneration(id);
   const [isDownloading, setIsDownloading] = useState(false);
-
-  useEffect(() => {
-    const fetchGeneration = async () => {
-      try {
-        const data = await generationService.getById(id!);
-        setGeneration(data);
-      } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : "Failed to load generation";
-        setError(message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (id) fetchGeneration();
-  }, [id]);
 
   const handleDownload = async () => {
     if (!generation) return;
@@ -53,10 +24,10 @@ export const GenerationDetail = () => {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -64,7 +35,7 @@ export const GenerationDetail = () => {
   if (error || !generation) {
     return (
       <div className="p-10 text-center text-red-600">
-        {error || "Generation not found"}
+        {error instanceof Error ? error.message : "Generation not found"}
       </div>
     );
   }

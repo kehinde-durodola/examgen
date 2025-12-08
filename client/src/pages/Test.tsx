@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
-import { generationService } from "@/services";
+import { useGeneration, useSubmitScore } from "@/hooks";
+import { Spinner } from "@/components/ui";
 import {
   TestHeader,
   TestProgress,
@@ -9,38 +9,29 @@ import {
   QuestionDots,
 } from "@/components/test";
 import { calculateScore } from "@/lib";
-import type { Question, AnswerKey } from "@/types";
+import type { AnswerKey } from "@/types";
 
 export const Test = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const { data: generation, isLoading } = useGeneration(id);
+  const submitScore = useSubmitScore();
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, AnswerKey>>({});
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+
+  const questions = generation?.questions ?? [];
 
   useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const data = await generationService.getById(id!);
-        if (data.questions) {
-          setQuestions(data.questions);
-        }
-      } catch (error) {
-        console.error("Failed to fetch test", error);
-        navigate("/dashboard");
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (id) fetchQuestions();
-  }, [id, navigate]);
+    if (!isLoading && !questions.length) {
+      navigate("/dashboard");
+    }
+  }, [isLoading, questions.length, navigate]);
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin text-blue-600" />
+      <div className="h-screen flex items-center justify-center bg-slate-50">
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -72,8 +63,6 @@ export const Test = () => {
   };
 
   const handleSubmit = async () => {
-    setSubmitting(true);
-
     let correctCount = 0;
     questions.forEach((q) => {
       if (answers[q.id] === q.correctAnswer) {
@@ -83,7 +72,7 @@ export const Test = () => {
     const score = calculateScore(correctCount, totalQuestions);
 
     try {
-      await generationService.submitScore(id!, { score });
+      await submitScore.mutateAsync({ id: id!, data: { score } });
 
       const resultData = {
         score,
@@ -95,7 +84,6 @@ export const Test = () => {
       navigate(`/results/${id}`);
     } catch (error) {
       console.error("Failed to submit score", error);
-      setSubmitting(false);
     }
   };
 
@@ -121,7 +109,7 @@ export const Test = () => {
             onNext={handleNext}
             isFirst={currentQuestionIndex === 0}
             isLast={currentQuestionIndex === totalQuestions - 1}
-            isSubmitting={submitting}
+            isSubmitting={submitScore.isPending}
           />
 
           <QuestionDots

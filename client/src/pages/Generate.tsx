@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks";
-import { generationService } from "@/services";
+import { useAuth, useCreateGeneration } from "@/hooks";
 import { Card, CardContent } from "@/components/ui";
 import {
   SourceTabs,
@@ -14,13 +13,13 @@ import type { Difficulty, QuestionCount } from "@/types";
 export const Generate = () => {
   const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
+  const createGeneration = useCreateGeneration();
 
   const [activeTab, setActiveTab] = useState<"pdf" | "text">("pdf");
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState("");
   const [questionCount, setQuestionCount] = useState<QuestionCount>(10);
   const [difficulty, setDifficulty] = useState<Difficulty>("Medium");
-  const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
@@ -30,11 +29,10 @@ export const Generate = () => {
     )
       return;
 
-    setIsGenerating(true);
     setError(null);
 
     try {
-      const response = await generationService.create({
+      const response = await createGeneration.mutateAsync({
         file: activeTab === "pdf" ? file ?? undefined : undefined,
         textInput: activeTab === "text" ? text : undefined,
         questionCount,
@@ -49,8 +47,6 @@ export const Generate = () => {
           ? err.message
           : "Failed to generate questions. Please try again.";
       setError(message);
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -100,7 +96,7 @@ export const Generate = () => {
             onQuestionCountChange={setQuestionCount}
             onDifficultyChange={setDifficulty}
             onGenerate={handleGenerate}
-            isGenerating={isGenerating}
+            isGenerating={createGeneration.isPending}
             isDisabled={isDisabled}
           />
         </div>

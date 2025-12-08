@@ -1,7 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/context";
 import { MainLayout, TestLayout } from "@/components/layout";
-import { ProtectedRoute, PublicOnlyRoute } from "@/components/shared";
+import {
+  ProtectedRoute,
+  PublicOnlyRoute,
+  ScrollToTop,
+} from "@/components/shared";
 import {
   Landing,
   Login,
@@ -17,6 +21,7 @@ import {
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <Routes>
           <Route element={<MainLayout />}>

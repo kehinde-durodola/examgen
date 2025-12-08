@@ -28,6 +28,6 @@ export const authService = {
   },
 
   async updateProfile(data: UpdateProfileRequest): Promise<User> {
-    return api.patch<never, User>("/users/profile", data);
+    return api.patch<never, User>("/users/me", data);
   },
 };

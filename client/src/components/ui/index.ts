@@ -23,3 +23,5 @@ export { Progress } from "./Progress";
 export type { ProgressProps } from "./Progress";
 
 export { Skeleton } from "./Skeleton";
+
+export { Spinner } from "./Spinner";

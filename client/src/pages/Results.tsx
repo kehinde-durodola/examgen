@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
-import { generationService } from "@/services";
+import { useGeneration } from "@/hooks";
+import { Spinner } from "@/components/ui";
 import { ResultCard, AnswerReview } from "@/components/test";
-import type { Question, AnswerKey } from "@/types";
+import type { AnswerKey } from "@/types";
 
 interface StoredResult {
   score: number;
@@ -15,42 +15,27 @@ interface StoredResult {
 export const Results = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { data: generation, isLoading } = useGeneration(id);
   const [results, setResults] = useState<StoredResult | null>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const stored = localStorage.getItem(`result-${id}`);
+    if (stored) {
+      setResults(JSON.parse(stored));
+    } else if (!isLoading) {
+      navigate(`/generations/${id}`);
+    }
+  }, [id, isLoading, navigate]);
 
-    const fetchQuestions = async () => {
-      try {
-        const data = await generationService.getById(id!);
-        if (data.questions) {
-          setQuestions(data.questions);
-        }
-
-        if (stored) {
-          setResults(JSON.parse(stored));
-        } else {
-          navigate(`/generations/${id}`);
-        }
-      } catch (error) {
-        console.error("Failed to load results data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) fetchQuestions();
-  }, [id, navigate]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <Loader2 className="animate-spin text-blue-600" />
+        <Spinner size="lg" />
       </div>
     );
   }
+
+  const questions = generation?.questions ?? [];
 
   if (!results || !questions.length) return null;
 

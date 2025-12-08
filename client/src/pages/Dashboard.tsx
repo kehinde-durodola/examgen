@@ -1,31 +1,14 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, Loader2 } from "lucide-react";
-import { useAuth } from "@/hooks";
-import { generationService } from "@/services";
+import { Sparkles } from "lucide-react";
+import { useAuth, useGenerations } from "@/hooks";
+import { Spinner } from "@/components/ui";
 import { TokenCard } from "@/components/dashboard";
 import { EmptyState, GenerationCard } from "@/components/shared";
-import type { Generation } from "@/types";
 
 export const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [generations, setGenerations] = useState<Generation[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchGenerations = async () => {
-      try {
-        const data = await generationService.getAll();
-        setGenerations(data);
-      } catch (error) {
-        console.error("Failed to fetch generations:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchGenerations();
-  }, []);
+  const { data: generations, isLoading } = useGenerations();
 
   return (
     <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
@@ -47,11 +30,11 @@ export const Dashboard = () => {
           Recent Generations
         </h2>
 
-        {loading ? (
+        {isLoading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <Spinner size="lg" />
           </div>
-        ) : generations.length === 0 ? (
+        ) : !generations?.length ? (
           <EmptyState
             icon={Sparkles}
             title="No generations yet"
