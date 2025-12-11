@@ -36,15 +36,15 @@ export const GenerationCard = ({ generation }: GenerationCardProps) => {
   return (
     <Card className="hover:border-blue-300 transition-colors group">
       <CardContent className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-start gap-4">
-          <div className="mt-1 bg-blue-50 p-2 rounded text-blue-600">
+        <div className="flex items-start gap-4 max-w-full overflow-hidden">
+          <div className="mt-1 bg-blue-50 p-2 rounded text-blue-600 flex-shrink-0">
             <FileText size={20} />
           </div>
-          <div>
-            <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+          <div className="overflow-hidden">
+            <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors truncate max-w-[250px] sm:max-w-[400px]">
               {generation.sourceName}
             </h3>
-            <div className="flex items-center gap-x-4 gap-y-2 mt-1 flex-wrap text-sm text-slate-500">
+            <div className="flex items-center gap-x-4 gap-y-1 mt-1 flex-wrap text-sm text-slate-500">
               <span className="flex items-center gap-1">
                 <AlertCircle size={14} /> {generation.questionCount} questions
               </span>
@@ -58,7 +58,7 @@ export const GenerationCard = ({ generation }: GenerationCardProps) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+        <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end flex-shrink-0">
           {getStatusBadge()}
           <Button
             variant="ghost"

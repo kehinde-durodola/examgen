@@ -74,27 +74,27 @@ export const Landing = () => {
 
   return (
     <div className="bg-white">
-      <div className="relative isolate pt-14 pb-20 sm:pt-20 sm:pb-28">
+      <div className="relative isolate pt-10 pb-16 sm:pt-20 sm:pb-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="mb-8 flex justify-center">
+            <div className="mb-6 sm:mb-8 flex justify-center">
               <div className="rounded-full px-3 py-1 text-sm font-semibold leading-6 text-blue-600 ring-1 ring-inset ring-blue-100 bg-blue-50">
                 AI-Powered Study Tool
               </div>
             </div>
-            <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-6xl mb-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-4 sm:mb-6">
               Transform Your Study Materials Into{" "}
               <span className="text-blue-600">Practice Exams</span>
             </h1>
-            <p className="text-lg leading-8 text-slate-600 mb-10">
+            <p className="text-base sm:text-lg leading-7 sm:leading-8 text-slate-600 mb-8 sm:mb-10 px-2 sm:px-0">
               Upload any PDF or paste your notes. Get intelligent
               multiple-choice questions instantly. Study smarter, not harder.
             </p>
-            <div className="flex items-center justify-center gap-x-6">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 px-4 sm:px-0">
               <Button
                 size="lg"
                 onClick={() => navigate("/register")}
-                className="px-8"
+                className="w-full sm:w-auto px-8"
               >
                 Get Started Free
               </Button>
@@ -102,6 +102,7 @@ export const Landing = () => {
                 variant="outline"
                 size="lg"
                 onClick={() => scrollToSection("how-it-works")}
+                className="w-full sm:w-auto"
               >
                 See How It Works
               </Button>
@@ -113,30 +114,31 @@ export const Landing = () => {
         </div>
       </div>
 
-      <div id="how-it-works" className="py-24 bg-slate-50">
+      <div id="how-it-works" className="py-16 sm:py-24 bg-slate-50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">
               How It Works
             </h2>
-            <p className="mt-4 text-lg text-slate-600">
+            <p className="mt-3 sm:mt-4 text-base sm:text-lg text-slate-600">
               Three simple steps to better exam preparation
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
             {steps.map((step, index) => (
               <div
                 key={index}
                 className="flex flex-col items-center text-center"
               >
-                <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center mb-6 text-blue-600">
-                  <step.icon size={32} />
+                <div className="h-14 w-14 sm:h-16 sm:w-16 bg-white rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center mb-4 sm:mb-6 text-blue-600">
+                  <step.icon size={28} className="sm:hidden" />
+                  <step.icon size={32} className="hidden sm:block" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2 sm:mb-3">
                   {step.title}
                 </h3>
-                <p className="text-slate-600 leading-relaxed">
+                <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
                   {step.description}
                 </p>
               </div>
@@ -145,28 +147,31 @@ export const Landing = () => {
         </div>
       </div>
 
-      <div id="features" className="py-24">
+      <div id="features" className="py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          <div className="mx-auto max-w-2xl text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">
               Everything You Need to Study Effectively
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {features.map((feature, idx) => (
               <Card
                 key={idx}
                 className="border-slate-100 shadow-sm hover:shadow-md transition-shadow"
               >
-                <CardContent className="pt-6">
-                  <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
-                    <feature.icon size={20} />
+                <CardContent className="pt-5 sm:pt-6">
+                  <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 mb-3 sm:mb-4">
+                    <feature.icon size={18} className="sm:hidden" />
+                    <feature.icon size={20} className="hidden sm:block" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1.5 sm:mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-slate-500">{feature.desc}</p>
+                  <p className="text-slate-500 text-sm sm:text-base">
+                    {feature.desc}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -175,17 +180,17 @@ export const Landing = () => {
       </div>
 
       <div className="bg-slate-50 border-t border-slate-200">
-        <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="relative isolate overflow-hidden bg-white px-6 py-24 shadow-sm sm:rounded-3xl sm:px-16 lg:flex lg:gap-x-20 lg:px-24 border border-slate-200">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:py-24 sm:px-6 lg:px-8">
+          <div className="relative isolate overflow-hidden bg-white px-5 py-16 shadow-sm sm:rounded-3xl sm:px-16 sm:py-24 lg:flex lg:gap-x-20 lg:px-24 border border-slate-200 rounded-2xl">
             <div className="mx-auto max-w-md text-center lg:mx-0 lg:flex-auto lg:py-8 lg:text-left">
-              <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">
                 Ready to Study Smarter?
               </h2>
-              <p className="mt-6 text-lg leading-8 text-slate-600">
+              <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-slate-600">
                 Join thousands of students using AI to prepare for exams
                 efficiently and effectively.
               </p>
-              <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
+              <div className="mt-8 sm:mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
                 <Button size="lg" onClick={() => navigate("/register")}>
                   Create Free Account
                 </Button>
