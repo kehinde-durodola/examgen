@@ -41,3 +41,25 @@ export const update = async (
     data,
   });
 };
+
+export const decrementTokens = async (userId: string) => {
+  return await prisma.user.update({
+    where: { id: userId },
+    data: {
+      tokensRemaining: {
+        decrement: 1,
+      },
+    },
+  });
+};
+
+export const incrementTokens = async (userId: string) => {
+  return await prisma.user.update({
+    where: { id: userId },
+    data: {
+      tokensRemaining: {
+        increment: 1,
+      },
+    },
+  });
+};

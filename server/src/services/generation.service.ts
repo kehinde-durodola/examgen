@@ -1,66 +1,19 @@
 import {
-  create as createGeneration,
-  findById as findGenerationById,
-  findByUserId,
+  create,
+  findById,
   updateStatus,
+  findProcessingByUserId,
 } from "../repositories/generation.repository.js";
-import { createMany as createManyQuestions } from "../repositories/question.repository.js";
+import { createMany } from "../repositories/question.repository.js";
+import {
+  findById as findUserById,
+  decrementTokens,
+  incrementTokens,
+} from "../repositories/user.repository.js";
+import { generateQuestions } from "./openai.service.js";
 import { extractTextFromPDF } from "../utils/pdf.util.js";
 import { validateTextLength } from "../utils/validation.util.js";
-import { consumeToken } from "./token.service.js";
-import { openai } from "../config/openai.js";
 import { IPDFFile } from "../types/generation.types.js";
-
-const buildPrompt = (
-  content: string,
-  questionCount: number,
-  difficulty: string
-): string => {
-  return `You are an expert educator creating exam questions. Generate exactly ${questionCount} multiple-choice questions based on the content below.
-
-Difficulty Level: ${difficulty}
-
-Requirements:
-- Create exactly ${questionCount} questions
-- Each question must have 4 options (A, B, C, D)
-- Only one correct answer per question
-- Provide a clear explanation for the correct answer
-- Questions should test understanding, not just memorization
-- Difficulty should match: ${difficulty}
-
-Content:
-${content}
-
-Response format (JSON only):
-{
-  "questions": [
-    {
-      "questionText": "Question here?",
-      "options": {
-        "A": "Option A",
-        "B": "Option B",
-        "C": "Option C",
-        "D": "Option D"
-      },
-      "correctAnswer": "A",
-      "explanation": "Explanation here"
-    }
-  ]
-}`;
-};
-
-const parseAIResponse = (response: string): any[] => {
-  try {
-    const cleaned = response
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
-    const parsed = JSON.parse(cleaned);
-    return parsed.questions || [];
-  } catch (error) {
-    throw new Error("Failed to parse AI response");
-  }
-};
 
 export const createGenerationService = async (
   userId: string,
@@ -69,37 +22,58 @@ export const createGenerationService = async (
   questionCount: number,
   difficulty: string
 ) => {
-  let content: string;
-  let sourceType: "PDF" | "TEXT";
-  let sourceName: string;
+  if (!file && !textInput) {
+    throw new Error("Provide either file or text input");
+  }
 
   if (file && textInput) {
     throw new Error("Provide either file or text input, not both");
   }
 
-  if (!file && !textInput) {
-    throw new Error("Provide either file or text input");
-  }
+  let finalText = "";
+  let sourceType = "";
+  let sourceName = "";
 
   if (file) {
-    content = await extractTextFromPDF(file.buffer);
+    finalText = await extractTextFromPDF(file.buffer);
     sourceType = "PDF";
     sourceName = file.originalname;
   } else {
-    content = textInput!;
+    finalText = textInput!;
     sourceType = "TEXT";
-    const snippet = content.substring(0, 50);
-    sourceName = `Pasted: ${snippet}${content.length > 50 ? "..." : ""}`;
+    sourceName = `Pasted: ${textInput!.substring(0, 50)}...`;
   }
 
-  const validation = validateTextLength(content, questionCount);
-  if (!validation.valid) {
-    throw new Error(validation.error);
+  validateTextLength(finalText, questionCount);
+  console.log("✅ Validation passed:", {
+    textLength: finalText.length,
+    questionCount,
+    minRequired: questionCount * 50,
+  });
+
+  const user = await findUserById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
   }
 
-  await consumeToken(userId);
+  if (user.tokensRemaining < 1) {
+    throw new Error(
+      "No tokens remaining. Tokens refresh daily at midnight UTC."
+    );
+  }
 
-  const generation = await createGeneration({
+  const existingProcessing = await findProcessingByUserId(userId);
+
+  if (existingProcessing) {
+    throw new Error(
+      "You already have a generation in progress. Please wait for it to complete or check your dashboard."
+    );
+  }
+
+  await decrementTokens(userId);
+
+  const generation = await create({
     userId,
     sourceType,
     sourceName,
@@ -108,38 +82,45 @@ export const createGenerationService = async (
   });
 
   try {
-    const prompt = buildPrompt(content, questionCount, difficulty);
+    const questions = await generateQuestions(
+      finalText,
+      questionCount,
+      difficulty
+    );
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-    });
-
-    const aiResponse = completion.choices[0]?.message?.content || "";
-    const questions = parseAIResponse(aiResponse);
-
-    if (questions.length !== questionCount) {
-      throw new Error(
-        `Expected ${questionCount} questions, got ${questions.length}`
-      );
-    }
-
-    await createManyQuestions(generation.id, questions);
+    await createMany(
+      generation.id,
+      questions.map((q) => ({
+        questionText: q.questionText,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        explanation: q.explanation,
+      }))
+    );
 
     await updateStatus(generation.id, "completed");
 
-    const result = await findGenerationById(generation.id);
+    const updatedGeneration = await findById(generation.id);
 
-    return result;
+    return updatedGeneration;
   } catch (error) {
+    await incrementTokens(userId);
+
     await updateStatus(generation.id, "failed");
-    throw error;
+
+    const originalError =
+      error instanceof Error ? error.message : "Unknown error";
+
+    const userFriendlyError = new Error("Generation failed, please try again");
+    (userFriendlyError as any).code = "GENERATION_FAILED";
+    (userFriendlyError as any).details = originalError;
+
+    throw userFriendlyError;
   }
 };
 
-export const getGeneration = async (generationId: string, userId: string) => {
-  const generation = await findGenerationById(generationId);
+export const getGeneration = async (id: string, userId: string) => {
+  const generation = await findById(id);
 
   if (!generation) {
     throw new Error("Generation not found");
@@ -153,5 +134,8 @@ export const getGeneration = async (generationId: string, userId: string) => {
 };
 
 export const getUserGenerations = async (userId: string) => {
+  const { findByUserId } = await import(
+    "../repositories/generation.repository.js"
+  );
   return await findByUserId(userId);
 };

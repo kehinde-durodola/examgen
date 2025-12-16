@@ -14,7 +14,10 @@ export const loginSchema = z.object({
 export const createGenerationSchema = z.object({
   questionCount: z.coerce.number().int().min(5).max(20),
   difficulty: z.enum(["Easy", "Medium", "Hard"]),
-  textInput: z.string().min(250).optional(),
+  textInput: z
+    .string()
+    .min(250, "Text must be at least 250 characters")
+    .optional(),
 });
 
 export const updateScoreSchema = z.object({

@@ -64,3 +64,12 @@ export const deleteExpired = async () => {
     },
   });
 };
+
+export const findProcessingByUserId = async (userId: string) => {
+  return await prisma.generation.findFirst({
+    where: {
+      userId,
+      status: "processing",
+    },
+  });
+};

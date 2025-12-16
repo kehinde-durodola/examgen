@@ -5,7 +5,7 @@ import { errorResponse } from "../utils/response.util.js";
 import { logger } from "../utils/logger.util.js";
 
 export const errorHandler = (
-  error: Error,
+  error: any,
   req: Request,
   res: Response,
   next: NextFunction
@@ -15,6 +15,7 @@ export const errorHandler = (
     stack: error.stack,
     path: req.path,
     method: req.method,
+    details: error.details || undefined,
   });
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -37,13 +38,11 @@ export const errorHandler = (
       field: err.path.join("."),
       message: err.message,
     }));
-    return errorResponse(
-      res,
-      "Validation failed",
-      400,
-      "VALIDATION_ERROR",
-      details
-    );
+
+    const firstError = error.issues[0];
+    const userMessage = firstError.message;
+
+    return errorResponse(res, userMessage, 400, "VALIDATION_ERROR", details);
   }
 
   if (error.name === "JsonWebTokenError") {
@@ -62,6 +61,7 @@ export const errorHandler = (
     res,
     error.message || "Internal server error",
     500,
-    "INTERNAL_ERROR"
+    error.code || "INTERNAL_ERROR",
+    error.details || undefined
   );
 };
