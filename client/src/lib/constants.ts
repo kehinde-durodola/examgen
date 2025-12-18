@@ -3,14 +3,8 @@ export const API_URL =
 
 export const TOKEN_STORAGE_KEY = "examgen_token";
 
-export const DIFFICULTY_LEVELS = ["Easy", "Medium", "Hard"] as const;
-
-export const QUESTION_COUNTS = [5, 10, 15, 20] as const;
-
 export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-export const ACCEPTED_FILE_TYPES = {
-  "application/pdf": [".pdf"],
-};
+export const MAX_FILE_SIZE_MB = 5;
 
-export const MIN_CHARS_PER_QUESTION = 50;
+export const MIN_TEXT_CHARS = 250;

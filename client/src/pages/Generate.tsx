@@ -8,6 +8,7 @@ import {
   TextInput,
   GenerationOptions,
 } from "@/components/generate";
+import { MIN_TEXT_CHARS } from "@/lib/constants";
 import type { Difficulty, QuestionCount } from "@/types";
 
 export const Generate = () => {
@@ -25,7 +26,7 @@ export const Generate = () => {
   const handleGenerate = async () => {
     if (
       (activeTab === "pdf" && !file) ||
-      (activeTab === "text" && !text.trim())
+      (activeTab === "text" && text.trim().length < MIN_TEXT_CHARS)
     )
       return;
 
@@ -53,7 +54,7 @@ export const Generate = () => {
   const isDisabled =
     user?.tokensRemaining === 0 ||
     (activeTab === "pdf" && !file) ||
-    (activeTab === "text" && !text.trim());
+    (activeTab === "text" && text.trim().length < MIN_TEXT_CHARS);
 
   return (
     <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
