@@ -54,12 +54,12 @@ export const updateScore = async (id: string, score: number) => {
 };
 
 export const deleteExpired = async () => {
-  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
   return await prisma.generation.deleteMany({
     where: {
       createdAt: {
-        lt: twentyFourHoursAgo,
+        lt: fortyEightHoursAgo,
       },
     },
   });

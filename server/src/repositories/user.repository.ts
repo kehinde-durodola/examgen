@@ -63,3 +63,12 @@ export const incrementTokens = async (userId: string) => {
     },
   });
 };
+
+export const resetAllTokens = async () => {
+  return await prisma.user.updateMany({
+    data: {
+      tokensRemaining: 3,
+      tokensLastRefreshed: new Date(),
+    },
+  });
+};

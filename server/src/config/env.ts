@@ -26,4 +26,6 @@ export const env = {
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS!,
   DAILY_TOKEN_LIMIT: parseInt(process.env.DAILY_TOKEN_LIMIT || "3", 10),
   TOKEN_REFRESH_CRON: process.env.TOKEN_REFRESH_CRON || "0 0 * * *",
+  GENERATION_CLEANUP_CRON: process.env.GENERATION_CLEANUP_CRON || "0 * * * *",
+  CRON_SECRET: process.env.CRON_SECRET,
 };

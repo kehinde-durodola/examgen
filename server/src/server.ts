@@ -2,11 +2,17 @@ import app from "./app.js";
 import { env } from "./config/env.js";
 import { prisma } from "./config/database.js";
 import { logger } from "./utils/logger.util.js";
+import { startTokenRefreshCron } from "./cron/token-refresh.cron.js";
+import { startGenerationCleanupCron } from "./cron/generation-cleanup.cron.js";
 
 const startServer = async () => {
   try {
     await prisma.$connect();
     logger.info("Database connected successfully");
+
+    startTokenRefreshCron();
+    startGenerationCleanupCron();
+    logger.info("Cron jobs initialized successfully");
 
     const PORT = env.PORT;
 
