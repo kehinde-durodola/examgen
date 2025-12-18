@@ -42,7 +42,7 @@ export const Register = () => {
     setLoading(true);
     setError(null);
     try {
-      await registerUser(data.email, data.password, data.name);
+      await registerUser(data.email, data.password, data.name || "");
       navigate("/dashboard");
     } catch (err: unknown) {
       const message =
