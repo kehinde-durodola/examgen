@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Zap, Plus } from "lucide-react";
 import { Button, Card, CardContent } from "@/components/ui";
+import { getTimeUntilMidnightUTC } from "@/lib";
 import type { User } from "@/types";
 
 interface TokenCardProps {
@@ -40,7 +41,9 @@ export const TokenCard = ({ user }: TokenCardProps) => {
                 </span>
               </span>
             </div>
-            <p className="mt-2 text-sm text-slate-500">Refreshes in 8 hours</p>
+            <p className="mt-2 text-sm text-slate-500">
+              Refreshes in {getTimeUntilMidnightUTC()}
+            </p>
           </div>
           <div>
             <Button

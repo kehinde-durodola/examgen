@@ -1,11 +1,8 @@
-import {
-  createContext,
-  useState,
-  useEffect,
-  useCallback,
-  type ReactNode,
-} from "react";
-import { authService, removeAuthToken, getAuthToken } from "@/services";
+import { createContext, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { authService } from "@/services";
+import { getAuthToken, removeAuthToken } from "@/services/api";
+import { useUser } from "@/hooks/useUser";
 import type { User } from "@/types";
 
 interface AuthContextType {
@@ -13,76 +10,81 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name?: string) => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => void;
   updateProfile: (data: { name?: string; email?: string }) => Promise<void>;
-  refreshUser: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
 );
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const refreshUser = useCallback(async () => {
-    try {
-      const userData = await authService.getCurrentUser();
-      setUser(userData);
-    } catch {
-      setUser(null);
-      removeAuthToken();
+const clearResultsFromStorage = () => {
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith("result-")) {
+      keysToRemove.push(key);
     }
-  }, []);
+  }
+  keysToRemove.forEach((key) => localStorage.removeItem(key));
+};
 
-  useEffect(() => {
-    const initAuth = async () => {
-      const token = getAuthToken();
-      if (token) {
-        await refreshUser();
-      }
-      setIsLoading(false);
-    };
-    initAuth();
-  }, [refreshUser]);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = useQueryClient();
+  const { data: user = null, isLoading: isUserLoading } = useUser();
 
-  const login = async (email: string, password: string) => {
-    const response = await authService.login({ email, password });
-    setUser(response.user);
-  };
+  const hasToken = !!getAuthToken();
+  const isLoading = hasToken && isUserLoading;
+  const isAuthenticated = !!user;
 
-  const register = async (email: string, password: string, name?: string) => {
-    const response = await authService.register({ email, password, name });
-    setUser(response.user);
-  };
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const response = await authService.login({ email, password });
+      queryClient.setQueryData(["user"], response.user);
+    },
+    [queryClient]
+  );
 
-  const logout = () => {
+  const register = useCallback(
+    async (email: string, password: string, name: string) => {
+      const response = await authService.register({ email, password, name });
+      queryClient.setQueryData(["user"], response.user);
+    },
+    [queryClient]
+  );
+
+  const logout = useCallback(() => {
     removeAuthToken();
-    setUser(null);
-  };
+    clearResultsFromStorage();
+    queryClient.setQueryData(["user"], null);
+    queryClient.clear();
+  }, [queryClient]);
 
-  const updateProfile = async (data: { name?: string; email?: string }) => {
-    const updatedUser = await authService.updateProfile(data);
-    setUser(updatedUser);
-  };
+  const refreshUser = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["user"] });
+  }, [queryClient]);
+
+  const updateProfile = useCallback(
+    async (data: { name?: string; email?: string }) => {
+      const updatedUser = await authService.updateProfile(data);
+      queryClient.setQueryData(["user"], updatedUser);
+    },
+    [queryClient]
+  );
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        isAuthenticated,
         isLoading,
         login,
         register,
         logout,
-        updateProfile,
         refreshUser,
+        updateProfile,
       }}
     >
       {children}

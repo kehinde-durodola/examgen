@@ -1,5 +1,6 @@
 export { EmptyState } from "./EmptyState";
 export { GenerationCard } from "./GenerationCard";
+export { GenerationCardSkeleton } from "./GenerationCardSkeleton";
 export { Breadcrumb } from "./Breadcrumb";
 export { QuestionPreview } from "./QuestionPreview";
 export { ProtectedRoute } from "./ProtectedRoute";

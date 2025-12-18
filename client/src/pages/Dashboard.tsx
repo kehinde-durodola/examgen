@@ -1,9 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 import { useAuth, useGenerations } from "@/hooks";
-import { Spinner } from "@/components/ui";
 import { TokenCard } from "@/components/dashboard";
-import { EmptyState, GenerationCard } from "@/components/shared";
+import {
+  EmptyState,
+  GenerationCard,
+  GenerationCardSkeleton,
+} from "@/components/shared";
 
 export const Dashboard = () => {
   const { user } = useAuth();
@@ -31,8 +34,10 @@ export const Dashboard = () => {
         </h2>
 
         {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Spinner size="lg" />
+          <div className="grid gap-4">
+            {[...Array(3)].map((_, i) => (
+              <GenerationCardSkeleton key={i} />
+            ))}
           </div>
         ) : !generations?.length ? (
           <EmptyState

@@ -1,4 +1,4 @@
-import { GraduationCap, Github, Globe, Linkedin } from "lucide-react";
+import { GraduationCap, Github, Mail, Linkedin } from "lucide-react";
 
 export const Footer = () => {
   const iconClass =
@@ -16,7 +16,7 @@ export const Footer = () => {
 
           <div className="flex items-center gap-2">
             <a
-              href="https://github.com"
+              href="https://github.com/kehinde-durodola"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"
@@ -25,16 +25,14 @@ export const Footer = () => {
               <Github className={iconSize} />
             </a>
             <a
-              href="https://example.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Portfolio"
+              href="mailto:devkehinde2020@gmail.com"
+              aria-label="Email"
               className={iconClass}
             >
-              <Globe className={iconSize} />
+              <Mail className={iconSize} />
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://www.linkedin.com/in/kehinde-durodola"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn"

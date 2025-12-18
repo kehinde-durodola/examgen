@@ -71,7 +71,7 @@ export const Register = () => {
               id="name"
               type="text"
               placeholder="John Doe"
-              label="Name (Optional)"
+              label="Name"
               {...register("name")}
             />
             <Input

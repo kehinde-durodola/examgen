@@ -16,13 +16,18 @@ export const useCreateGeneration = () => {
     mutationFn: (data: CreateGenerationRequest) =>
       generationService.create(data),
     onMutate: () => {
-      queryClient.invalidateQueries({ queryKey: ["generations"] });
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["generations"] });
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+      }, 3000);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["generations"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ["generations"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 };

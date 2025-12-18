@@ -5,45 +5,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(date: string | Date): string {
+export function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return "-";
+
+  const parsedDate = new Date(date);
+
+  if (isNaN(parsedDate.getTime())) {
+    return "-";
+  }
+
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(new Date(date));
-}
-
-export function formatRelativeTime(date: string | Date): string {
-  const now = new Date();
-  const then = new Date(date);
-  const seconds = Math.floor((now.getTime() - then.getTime()) / 1000);
-
-  const intervals = [
-    { label: "year", seconds: 31536000 },
-    { label: "month", seconds: 2592000 },
-    { label: "week", seconds: 604800 },
-    { label: "day", seconds: 86400 },
-    { label: "hour", seconds: 3600 },
-    { label: "minute", seconds: 60 },
-  ];
-
-  for (const interval of intervals) {
-    const count = Math.floor(seconds / interval.seconds);
-    if (count >= 1) {
-      return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
-    }
-  }
-
-  return "Just now";
-}
-
-export function truncate(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength).trim() + "...";
-}
-
-export function getMinChars(questionCount: number): number {
-  return questionCount * 50;
+  }).format(parsedDate);
 }
 
 export function calculateScore(correct: number, total: number): number {
@@ -61,4 +36,36 @@ export function getScoreBgColor(score: number): string {
   if (score >= 80) return "bg-green-100";
   if (score >= 60) return "bg-yellow-100";
   return "bg-red-100";
+}
+
+export function getTimeUntilMidnightUTC(): string {
+  const now = new Date();
+
+  const midnightUTC = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate() + 1,
+      0,
+      0,
+      0,
+      0
+    )
+  );
+
+  const diffMs = midnightUTC.getTime() - now.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (diffHours === 0) {
+    return `${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""}`;
+  }
+
+  if (diffMinutes === 0) {
+    return `${diffHours} hour${diffHours !== 1 ? "s" : ""}`;
+  }
+
+  return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ${diffMinutes} minute${
+    diffMinutes !== 1 ? "s" : ""
+  }`;
 }
