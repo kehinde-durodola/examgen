@@ -44,9 +44,6 @@ export const generationLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: false,
-  keyGenerator: (req) => {
-    return req.user?.id || req.ip || "unknown";
-  },
 });
 
 export const authenticatedLimiter = rateLimit({
@@ -62,9 +59,6 @@ export const authenticatedLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: false,
-  keyGenerator: (req) => {
-    return req.user?.id || req.ip || "unknown";
-  },
 });
 
 export const globalLimiter = rateLimit({
