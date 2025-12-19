@@ -1,30 +1,24 @@
 /**
  * Cron Webhook Endpoints
  *
- * These endpoints allow external cron services to trigger scheduled tasks.
- * This is necessary when hosting on platforms that automatically spin down
- * inactive servers after periods of inactivity.
+ * These endpoints provide HTTP access to scheduled task functions,
+ * enabling manual execution and external monitoring.
  *
- * How it works:
- * - External cron service (e.g., cron-job.org) calls these endpoints on schedule
- * - HTTP request wakes up sleeping server (if needed)
- * - Endpoint executes the scheduled task
- * - Server responds with success/failure
+ * Primary use cases:
+ * - Manual triggering for testing or emergency operations
+ * - Integration with external monitoring services
+ * - On-demand task execution via API calls
  *
- * For production deployments with always-active servers, the internal
- * cron jobs (see /cron folder) handle scheduling automatically without
- * needing these endpoints. However, having both provides redundancy.
+ * Note: Scheduled execution is handled by internal cron jobs (see /cron folder).
+ * These endpoints call the same underlying functions but via HTTP.
  *
  * Security: All endpoints require CRON_SECRET environment variable
  * to be passed in the X-Cron-Secret header.
  *
- * Setup Instructions:
- * 1. Set CRON_SECRET environment variable (generate a secure random string)
- * 2. Create account on cron-job.org (or similar service)
- * 3. Add jobs to call these endpoints:
- *    - POST /api/cron/refresh-tokens (schedule: 0 0 * * * - daily at midnight UTC)
- *    - POST /api/cron/cleanup-generations (schedule: 0 * * * * - every hour)
- * 4. Add header to requests: X-Cron-Secret: your-secret-value
+ * Usage:
+ * POST /api/cron/refresh-tokens
+ * POST /api/cron/cleanup-generations
+ * Header: X-Cron-Secret: your-secret-value
  */
 
 import express from "express";

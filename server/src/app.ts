@@ -4,6 +4,7 @@ import helmet from "helmet";
 import routes from "./routes/index.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { env } from "./config/env.js";
+import { globalLimiter } from "./middlewares/rate-limit.middleware.js";
 
 const app = express();
 
@@ -15,6 +16,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(globalLimiter);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
