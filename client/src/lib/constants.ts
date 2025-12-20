@@ -8,3 +8,5 @@ export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 export const MAX_FILE_SIZE_MB = 5;
 
 export const MIN_TEXT_CHARS = 250;
+
+export const MAX_TEXT_CHARS = 20000;

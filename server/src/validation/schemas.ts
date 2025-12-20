@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MAX_TEXT_LENGTH } from "../constants/index.js";
 
 export const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -17,6 +18,10 @@ export const createGenerationSchema = z.object({
   textInput: z
     .string()
     .min(250, "Text must be at least 250 characters")
+    .max(
+      MAX_TEXT_LENGTH,
+      `Text must not exceed ${MAX_TEXT_LENGTH.toLocaleString()} characters`
+    )
     .optional(),
 });
 

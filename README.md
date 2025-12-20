@@ -32,25 +32,22 @@ graph TB
     API[Express API<br/>Node.js + TypeScript]
     DB[(PostgreSQL<br/>Prisma ORM)]
     OpenAI[OpenAI API<br/>GPT-4o-mini]
-    Cron[External Cron<br/>cron-job.org]
 
     Client -->|HTTPS/REST| API
     API -->|SQL Queries| DB
     API -->|Generate Questions| OpenAI
-    Cron -->|Keep-Alive Ping| API
 
     style Client fill:#61dafb
     style API fill:#68a063
     style DB fill:#336791
     style OpenAI fill:#10a37f
-    style Cron fill:#ff6b6b
 ```
 
 **Architecture Highlights:**
 
 - RESTful API design with stateless JWT authentication
 - Server-side AI processing for question generation
-- Automated background tasks via external cron service
+- Internal cron jobs for automated maintenance (token refresh, cleanup)
 - PostgreSQL with Prisma ORM for type-safe database access
 
 ## Security

@@ -1,15 +1,20 @@
-import { MIN_CHARS_PER_QUESTION } from "../constants/index.js";
+import { MIN_CHARS_PER_QUESTION, MAX_TEXT_LENGTH } from "../constants/index.js";
 
 export const validateTextLength = (
   text: string,
   questionCount: number
 ): void => {
-  const requiredChars = questionCount * MIN_CHARS_PER_QUESTION;
-  const actualChars = text.trim().length;
+  const minCharacters = questionCount * MIN_CHARS_PER_QUESTION;
 
-  if (actualChars < requiredChars) {
+  if (text.length < minCharacters) {
     throw new Error(
-      `Text too short. Need at least ${requiredChars} characters for ${questionCount} questions (currently ${actualChars} characters)`
+      `Text is too short. Please provide at least ${minCharacters} characters for ${questionCount} questions. Your text has ${text.length} characters.`
+    );
+  }
+
+  if (text.length > MAX_TEXT_LENGTH) {
+    throw new Error(
+      `Text is too long. Maximum allowed is ${MAX_TEXT_LENGTH.toLocaleString()} characters. Your text has ${text.length.toLocaleString()} characters.`
     );
   }
 };

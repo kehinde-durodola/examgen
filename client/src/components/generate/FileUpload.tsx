@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { Upload, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui";
-import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from "@/lib/constants";
 
 interface FileUploadProps {
   file: File | null;
@@ -9,36 +7,10 @@ interface FileUploadProps {
 }
 
 export const FileUpload = ({ file, onFileChange }: FileUploadProps) => {
-  const [error, setError] = useState<string | null>(null);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setError(null);
-
     if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-
-      if (selectedFile.size > MAX_FILE_SIZE) {
-        const fileSizeMB = (selectedFile.size / (1024 * 1024)).toFixed(2);
-        setError(
-          `File size (${fileSizeMB}MB) exceeds the ${MAX_FILE_SIZE_MB}MB limit`
-        );
-        e.target.value = "";
-        return;
-      }
-
-      if (selectedFile.type !== "application/pdf") {
-        setError("Please upload a PDF file");
-        e.target.value = "";
-        return;
-      }
-
-      onFileChange(selectedFile);
+      onFileChange(e.target.files[0]);
     }
-  };
-
-  const handleRemove = () => {
-    setError(null);
-    onFileChange(null);
   };
 
   if (file) {
@@ -58,7 +30,7 @@ export const FileUpload = ({ file, onFileChange }: FileUploadProps) => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={handleRemove}
+          onClick={() => onFileChange(null)}
           className="text-slate-500 hover:text-red-600 flex-shrink-0 ml-2"
         >
           <X size={18} />
@@ -68,26 +40,21 @@ export const FileUpload = ({ file, onFileChange }: FileUploadProps) => {
   }
 
   return (
-    <div>
-      <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
-        <div className="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
-          <Upload className="w-10 h-10 mb-3 text-slate-400" />
-          <p className="mb-2 text-sm text-slate-500">
-            <span className="font-semibold">Click to upload</span> or drag and
-            drop
-          </p>
-          <p className="text-xs text-slate-500">
-            PDF (MAX. {MAX_FILE_SIZE_MB}MB)
-          </p>
-        </div>
-        <input
-          type="file"
-          className="hidden"
-          accept=".pdf"
-          onChange={handleChange}
-        />
-      </label>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-    </div>
+    <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+      <div className="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
+        <Upload className="w-10 h-10 mb-3 text-slate-400" />
+        <p className="mb-2 text-sm text-slate-500">
+          <span className="font-semibold">Click to upload</span> or drag and
+          drop
+        </p>
+        <p className="text-xs text-slate-500">PDF (MAX. 5MB)</p>
+      </div>
+      <input
+        type="file"
+        className="hidden"
+        accept=".pdf"
+        onChange={handleChange}
+      />
+    </label>
   );
 };
