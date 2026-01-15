@@ -14,7 +14,15 @@
     "install:all": "npm install && npm install --prefix server && npm install --prefix client",
     "prisma:generate": "cd server && npx prisma generate",
     "prisma:migrate": "cd server && npx prisma migrate dev",
-    "prisma:studio": "cd server && npx prisma studio"
+    "prisma:studio": "cd server && npx prisma studio",
+    "docker:dev": "docker-compose up",
+    "docker:dev:build": "docker-compose up --build",
+    "docker:dev:down": "docker-compose down",
+    "docker:prod": "BUILD_TARGET=production NODE_ENV=production ALLOWED_ORIGINS=http://localhost CLIENT_PORT=80 CLIENT_EXPOSE_PORT=80 START_CMD=\"node dist/server.js\" docker-compose up -d",
+    "docker:prod:build": "BUILD_TARGET=production NODE_ENV=production ALLOWED_ORIGINS=http://localhost CLIENT_PORT=80 CLIENT_EXPOSE_PORT=80 START_CMD=\"node dist/server.js\" docker-compose up -d --build",
+    "docker:prod:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:clean": "docker-compose down -v --remove-orphans"
   },
   "keywords": [
     "examgen",

@@ -1,6 +1,33 @@
 # ExamGen - AI-Powered Exam Question Generator
 
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)
+![Node](https://img.shields.io/badge/node-20+-green)
+![React](https://img.shields.io/badge/React-19.2-61dafb)
+![Express](https://img.shields.io/badge/Express-5.1-lightgrey)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-336791)
+![Prisma](https://img.shields.io/badge/Prisma-6.18-2D3748)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 An open-source web application that transforms study materials into practice exam questions using AI. Students upload PDFs or paste text to receive intelligent multiple-choice questions for self-assessment.
+
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [System Architecture](#system-architecture)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Quick Start (Docker)](#quick-start-docker)
+  - [Manual Installation](#manual-installation)
+- [Docker Deployment](#docker-deployment)
+- [Environment Variables](#environment-variables)
+- [API Endpoints](#api-endpoints)
+- [Development Scripts](#development-scripts)
+- [Security](#security)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
@@ -150,8 +177,40 @@ examgen/
 - Node.js 20+ LTS
 - PostgreSQL 15+
 - OpenAI API key
+- Docker & Docker Compose (optional, for containerized setup)
 
-### Installation
+### Quick Start (Docker)
+
+The fastest way to get ExamGen running locally:
+
+```bash
+# Clone repository
+git clone https://github.com/kehinde-durodola/examgen.git
+cd examgen
+
+# Create environment file from template
+cp .env.example .env
+
+# Edit .env and add your OPENAI_API_KEY (required)
+# Get your API key from: https://platform.openai.com/api-keys
+
+# Start all services with Docker
+npm run docker:dev:build
+
+# Access the application
+# Frontend: http://localhost:5173
+# Backend API: http://localhost:3000
+# Database: PostgreSQL on localhost:5432
+```
+
+Docker will automatically:
+
+- Set up PostgreSQL database
+- Run Prisma migrations
+- Start the backend server with hot reload
+- Start the frontend with hot reload
+
+### Manual Installation
 
 ```bash
 # Clone repository
@@ -191,6 +250,70 @@ npm run dev
 
 The backend will be available at: http://localhost:3000
 The frontend will be available at: http://localhost:5173
+
+## Docker Deployment
+
+ExamGen includes Docker support for local development.
+
+### Development with Docker
+
+Start all services (PostgreSQL, server, client) with hot reload:
+
+```bash
+# Build and start all containers
+npm run docker:dev:build
+
+# Or without rebuilding
+npm run docker:dev
+
+# View logs
+npm run docker:logs
+
+# Stop all containers
+npm run docker:dev:down
+
+# Clean up (remove containers and volumes)
+npm run docker:clean
+```
+
+**What's included:**
+
+- PostgreSQL 15 (port 5432)
+- Express server with hot reload (port 3000)
+- React client with Vite HMR (port 5173)
+- Automatic database migrations
+- Persistent data volumes
+
+### Docker Configuration
+
+Docker uses a root `.env` file for all environment variables. Create it from the template:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and set your values:
+
+```env
+# Required - Get from https://platform.openai.com/api-keys
+OPENAI_API_KEY=sk-your-actual-key-here
+
+# Optional - Change for production
+JWT_SECRET=your-secure-secret-here
+POSTGRES_PASSWORD=your-secure-password
+```
+
+**Important:** The `.env` file contains sensitive data and is gitignored. Never commit it to version control.
+
+### Docker Commands
+
+```bash
+npm run docker:dev              # Start dev environment
+npm run docker:dev:build        # Rebuild and start
+npm run docker:dev:down         # Stop containers
+npm run docker:logs             # View logs (follow mode)
+npm run docker:clean            # Remove all containers and volumes
+```
 
 ## API Endpoints
 
@@ -274,6 +397,7 @@ npm start                # Start production server
 # Database
 npm run prisma:generate  # Generate Prisma client
 npm run prisma:migrate   # Run database migrations
+npm run prisma:deploy    # Deploy migrations (production)
 npm run prisma:studio    # Open Prisma Studio GUI
 npm run prisma:seed      # Seed test user
 ```
@@ -284,7 +408,16 @@ npm run prisma:seed      # Seed test user
 npm run dev              # Start dev server with hot reload
 npm run build            # Build for production
 npm run preview          # Preview production build
-npm run lint             # Run ESLint
+```
+
+### Docker
+
+```bash
+npm run docker:dev              # Start development environment
+npm run docker:dev:build        # Build and start development
+npm run docker:dev:down         # Stop containers
+npm run docker:logs             # View container logs
+npm run docker:clean            # Clean up containers and volumes
 ```
 
 ## Test User (Development)

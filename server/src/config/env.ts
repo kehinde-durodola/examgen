@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 
+// Only load .env file if it exists (not in Docker where env vars are passed directly)
 dotenv.config();
 
 const requiredEnvVars = [

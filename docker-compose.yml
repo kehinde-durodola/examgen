@@ -1,0 +1,87 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: examgen-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-examgen}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-examgen_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-examgen_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-examgen} -d ${POSTGRES_DB:-examgen_db}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - examgen-network
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+      target: ${BUILD_TARGET:-development}
+    container_name: examgen-server
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-examgen}:${POSTGRES_PASSWORD:-examgen_dev_password}@postgres:5432/${POSTGRES_DB:-examgen_db}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-change-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PORT: 3000
+      NODE_ENV: ${NODE_ENV:-development}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:5173}
+      DAILY_TOKEN_LIMIT: ${DAILY_TOKEN_LIMIT:-3}
+      TOKEN_REFRESH_CRON: ${TOKEN_REFRESH_CRON:-0 0 * * *}
+      GENERATION_CLEANUP_CRON: ${GENERATION_CLEANUP_CRON:-0 * * * *}
+      CRON_SECRET: ${CRON_SECRET:-dev-cron-secret}
+    ports:
+      - "${SERVER_PORT:-3000}:3000"
+    volumes:
+      - ./server/src:/app/src
+      - ./server/prisma:/app/prisma
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "npx prisma migrate deploy && ${START_CMD:-npm run dev}"
+    networks:
+      - examgen-network
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+      target: ${BUILD_TARGET:-development}
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api}
+    container_name: examgen-client
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api}
+    ports:
+      - "${CLIENT_PORT:-5173}:${CLIENT_EXPOSE_PORT:-5173}"
+    volumes:
+      - ./client/src:/app/src
+      - ./client/index.html:/app/index.html
+      - ./client/vite.config.ts:/app/vite.config.ts
+      - /app/node_modules
+    depends_on:
+      - server
+    networks:
+      - examgen-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  examgen-network:
+    driver: bridge

@@ -48,4 +48,8 @@ server/prisma/migrations/migration_lock.toml
 # Misc
 .cache/
 temp/
+
+# Docker
+docker-compose.override.yml
+.docker/
 tmp/
